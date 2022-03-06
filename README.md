@@ -1,3 +1,7 @@
+Kafdrop: http://localhost:19000
+Zoonavigator: http://localhost:19001
+
+
 Examples:
 - https://docs.confluent.io/platform/current/streams/code-examples.html
 - https://github.com/apache/kafka/tree/trunk/streams/examples/src/main/java/org/apache/kafka/streams/examples
@@ -17,6 +21,11 @@ Guides:
 Blogs:
 - https://softwaremill.com/hands-on-kafka-streams-in-scala/
 
+Docs:
+- https://docs.confluent.io/platform/current/streams/developer-guide/manage-topics.html
+
 Commands:
     
     ./kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 --topic words_counted --from-beginning --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+    ./kafka-topics.sh --bootstrap-server 127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094 --list
