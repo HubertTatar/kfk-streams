@@ -1,8 +1,7 @@
 package io.huta.wordCount
 
+import io.huta.common.Logging
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
-import org.apache.kafka.common.serialization.StringSerializer
 
 import java.time.Duration
 import java.util.Properties

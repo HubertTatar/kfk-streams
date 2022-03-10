@@ -1,9 +1,8 @@
 package io.huta.wordCount
 
+import io.huta.common.{AdminConnectionProps, Logging}
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.scala.StreamsBuilder
 
 import java.time.Duration
@@ -11,7 +10,7 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 import scala.jdk.CollectionConverters._
 
-object WordCount extends Logging {
+object WordCount extends AdminConnectionProps with Logging {
 
   def main(args: Array[String]): Unit = {
 //    setup(kfkProps())
@@ -48,19 +47,5 @@ object WordCount extends Logging {
     val topic2 = new NewTopic("words_counted", 3, 3.toShort)
     val result = admin.createTopics(List(topic1, topic2).asJava)
     result.all().get(10, TimeUnit.SECONDS)
-  }
-
-  def kfkProps(): Properties = {
-    val props = new Properties
-     props.putAll(
-      Map(
-        StreamsConfig.APPLICATION_ID_CONFIG -> "starter",
-        StreamsConfig.BOOTSTRAP_SERVERS_CONFIG -> "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094",
-        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
-        StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG -> Serdes.String().getClass,
-        StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG -> Serdes.String().getClass,
-      ).asJava
-    )
-    props
   }
 }
