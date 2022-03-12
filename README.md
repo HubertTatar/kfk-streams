@@ -8,10 +8,13 @@ Examples:
 - https://github.com/confluentinc/kafka-streams-examples/tree/7.0.0-post/src/main/scala/io/confluent/examples/streams
 
 Materials:
+- https://docs.confluent.io/platform/current/streams/concepts.html#
 - https://www.confluent.io/blog/crossing-streams-joins-apache-kafka/
 - https://docs.confluent.io/platform/current/streams/developer-guide/app-reset-tool.html
 - https://www.confluent.io/blog/kafka-listeners-explained/
 - https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+- https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=83527158#KafkaStreamsJoinSemantics-newJoinSemantics
+- https://cwiki.apache.org/confluence/display/KAFKA/KIP-99%3A+Add+Global+Tables+to+Kafka+Streams
 
 Guides:
 - https://kafka.apache.org/31/documentation/streams/tutorial

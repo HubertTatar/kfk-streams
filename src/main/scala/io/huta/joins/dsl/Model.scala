@@ -1,5 +1,4 @@
-package io.huta.joins
-
+package io.huta.joins.dsl
 
 case class Stream1Data(key: Int, status: String)
 case class Stream2Data(key: Int, status: String)

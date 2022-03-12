@@ -18,6 +18,7 @@ object WordCount extends AdminConnectionProps with Logging {
   }
 
     def stream(): Unit = {
+      //implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
 
