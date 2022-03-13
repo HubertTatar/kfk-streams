@@ -2,7 +2,7 @@ package io.huta.wordCount
 
 import io.huta.common.{AdminConnectionProps, Logging}
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
-import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.{KafkaStreams, Topology}
 import org.apache.kafka.streams.scala.StreamsBuilder
 
 import java.time.Duration
@@ -13,16 +13,15 @@ import scala.jdk.CollectionConverters._
 object WordCount extends AdminConnectionProps with Logging {
 
   def main(args: Array[String]): Unit = {
-//    setup(kfkProps())
+    //    setup(kfkProps())
     stream()
   }
 
-    def stream(): Unit = {
-      //implcits for Consumed.with for builder.stream
+  def buildTopology(): Topology = {
+    //implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
 
-    val props = kfkProps()
     val builder = new StreamsBuilder
 
     builder.stream[String, String]("words_to_count")
@@ -32,8 +31,13 @@ object WordCount extends AdminConnectionProps with Logging {
       .count()
       .toStream
       .to("words_counted")
+    builder.build()
+  }
 
-    val streams = new KafkaStreams(builder.build(), props)
+  def stream(): Unit = {
+    val props = kfkProps()
+    val topology = buildTopology()
+    val streams = new KafkaStreams(topology, props)
     streams.cleanUp()
     streams.start()
 
@@ -44,6 +48,7 @@ object WordCount extends AdminConnectionProps with Logging {
 
   def setup(props: Properties): Unit = {
     def admin = AdminClient.create(props)
+
     val topic1 = new NewTopic("words_to_count", 3, 3.toShort)
     val topic2 = new NewTopic("words_counted", 3, 3.toShort)
     val result = admin.createTopics(List(topic1, topic2).asJava)
