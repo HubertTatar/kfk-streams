@@ -1,8 +1,8 @@
 package io.huta.joins.dsl
 
-import io.huta.common.{AdminConnectionProps, JsonDeserializer, JsonSerializer, Logging, ProducerDefault}
+import io.huta.common._
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.common.serialization.{IntegerSerializer, Serde, Serdes}
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.kstream.JoinWindows
@@ -13,12 +13,12 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 import scala.jdk.CollectionConverters._
 
-object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with ProducerDefault with Logging {
+object StreamToStreamInner extends AdminConnectionProps with ProducerDefault with Logging {
 
   def main(args: Array[String]): Unit = {
 //    setup(kfkProps())
-    new Thread(producer1(producerProperties())).start()
-    new Thread(producer2(producerProperties())).start()
+//    new Thread(producer1(producerProperties())).start()
+//    new Thread(producer2(producerProperties())).start()
     join()
   }
 
@@ -35,7 +35,7 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
     val stream1 = builder.stream[Int, Stream1Data]("join_topic_3_part")
     val stream2 = builder.stream[Int, Stream2Data]("join_topic_6_part")
 
-    val streamsJoined = stream1.outerJoin(stream2)(
+    val streamsJoined = stream1.join(stream2)(
       (s1data, s2data) => StreamJoined(s1data.key, s2data.key, s1data.status, s2data.status),
       JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(30))
     ).to("join_output_diff_part")
@@ -53,7 +53,7 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
     () => {
       val producer = new KafkaProducer(props, new IntegerSerializer, new JsonSerializer[Stream2Data])
 
-      for (i <- 1 to 1_000_000) {
+      for (i <- 1 to 1_000_000 by 2) {
         producer.send(new ProducerRecord("join_topic_6_part", i, Stream2Data(i, "StatusA")))
       }
       log.info("producer 2 finished")
@@ -66,7 +66,7 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
     () => {
       val producer = new KafkaProducer(props, new IntegerSerializer, new JsonSerializer[Stream1Data])
 
-      for (i <- 1 to 1_000_000) {
+      for (i <- 1 to 1_000_000 by 3) {
         producer.send(new ProducerRecord("join_topic_3_part", i, Stream1Data(i, "StatusB")))
       }
       log.info("producer 1 finished")
@@ -78,7 +78,7 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
   def setup(props: Properties): Unit = {
     def admin = AdminClient.create(props)
     val topic1 = new NewTopic("join_topic_3_part", 3, 3.toShort)
-    val topic2 = new NewTopic("join_topic_6_part", 6, 3.toShort)
+    val topic2 = new NewTopic("join_topic_6_part", 3, 3.toShort)
     val topic3 = new NewTopic("join_output_diff_part", 3, 3.toShort)
     val result = admin.createTopics(List(topic1, topic2, topic3).asJava)
     result.all().get(10, TimeUnit.SECONDS)
