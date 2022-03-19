@@ -14,7 +14,11 @@ Materials:
 - https://www.confluent.io/blog/kafka-listeners-explained/
 - https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
 - https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=83527158#KafkaStreamsJoinSemantics-newJoinSemantics
+
+KIP:
+- https://cwiki.apache.org/confluence/display/KAFKA/Index
 - https://cwiki.apache.org/confluence/display/KAFKA/KIP-99%3A+Add+Global+Tables+to+Kafka+Streams
+- https://cwiki.apache.org/confluence/display/KAFKA/KIP-418%3A+A+method-chaining+way+to+branch+KStream
 
 Guides:
 - https://kafka.apache.org/31/documentation/streams/tutorial
