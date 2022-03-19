@@ -1,6 +1,6 @@
 package io.huta.joins.dsl
 
-import io.huta.common.{AdminConnectionProps, JsonDeserializer, JsonSerializer, Logging, ProducerDefault}
+import io.huta.common.{AdminConnectionProps, JsonDeserializer, JsonSerializer, Logging, ProducerDefault, SetupTopic}
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.serialization.{IntegerSerializer, Serde, Serdes}
@@ -13,7 +13,7 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 import scala.jdk.CollectionConverters._
 
-object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with ProducerDefault with Logging {
+object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with ProducerDefault with SetupTopic with Logging {
 
   def main(args: Array[String]): Unit = {
 //    setup(kfkProps())
@@ -76,12 +76,6 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
   }
 
   def setup(props: Properties): Unit = {
-    def admin = AdminClient.create(props)
-    val topic1 = new NewTopic("join_topic_3_part", 3, 3.toShort)
-    val topic2 = new NewTopic("join_topic_6_part", 6, 3.toShort)
-    val topic3 = new NewTopic("join_output_diff_part", 3, 3.toShort)
-    val result = admin.createTopics(List(topic1, topic2, topic3).asJava)
-    result.all().get(10, TimeUnit.SECONDS)
-    admin.close()
+    setupTopics(props, List("join_topic_3_part","join_topic_6_part", "join_output_diff_part"))
   }
 }

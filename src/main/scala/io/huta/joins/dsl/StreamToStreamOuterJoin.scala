@@ -1,7 +1,6 @@
 package io.huta.joins.dsl
 
-import io.huta.common.{AdminConnectionProps, JsonDeserializer, JsonSerializer, Logging, ProducerDefault}
-import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
+import io.huta.common.{AdminConnectionProps, JsonDeserializer, JsonSerializer, Logging, ProducerDefault, SetupTopic}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.serialization.{IntegerSerializer, Serde, Serdes, StringDeserializer, StringSerializer}
@@ -14,7 +13,7 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 import scala.jdk.CollectionConverters._
 
-object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault with Logging {
+object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault with SetupTopic with Logging {
 
 
   def main(args: Array[String]): Unit = {
@@ -94,15 +93,8 @@ object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault
     consumer.close()
   }
 
-  def setup(props: Properties): Unit = {
-    def admin = AdminClient.create(props)
-
-    val topic1 = new NewTopic("join_topic_1", 3, 3.toShort)
-    val topic2 = new NewTopic("join_topic_2", 3, 3.toShort)
-    val topic3 = new NewTopic("join_output", 3, 3.toShort)
-    val result = admin.createTopics(List(topic1, topic2, topic3).asJava)
-    result.all().get(10, TimeUnit.SECONDS)
-    admin.close()
+  def setup(props: Properties, topics: List[String]): Unit = {
+    setupTopics(props, List("join_topic_1", "join_topic_2", "join_output"))
   }
 
   def consumerProperties(): Properties = {
