@@ -1,0 +1,11 @@
+{
+ "namespace": "io.huta.schema",
+ "type": "record",
+ "name": "Impression",
+ "fields": [
+     {"name": "id", "type": "int"},
+     {"name": "some_num",  "type": ["int", "null"]},
+     {"name": "name", "type": ["string", "null"]},
+     {"name": "type", "type": ["string", "null"]}
+ ]
+}
