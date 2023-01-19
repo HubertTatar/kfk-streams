@@ -21,13 +21,14 @@ object WordCountProducer {
 
   def producerProperties(): Properties = {
     val props = new Properties()
-    props.putAll(Map(
-      ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094",
-      ProducerConfig.ACKS_CONFIG -> "all",
-      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringSerializer",
-      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringSerializer"
-
-    ).asJava)
+    props.putAll(
+      Map(
+        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094",
+        ProducerConfig.ACKS_CONFIG -> "all",
+        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringSerializer",
+        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringSerializer"
+      ).asJava
+    )
     props
   }
 }

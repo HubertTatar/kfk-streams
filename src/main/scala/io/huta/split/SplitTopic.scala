@@ -20,22 +20,18 @@ object SplitTopic extends AdminConnectionProps with ProducerDefault with SetupTo
   }
 
   def split(): Unit = {
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
-
 
     val props = kfkProps()
     val builder = new StreamsBuilder
 
-    builder.stream[Int, String]("split_original")
+    builder
+      .stream[Int, String]("split_original")
       .split()
-      .branch((key, _) => key % 2 != 0,
-        Branched.withConsumer[Int, String](ks => ks.to("split_1"))
-      )
-      .branch ((key, _) => key % 2 == 0,
-        Branched.withConsumer[Int, String](ks => ks.to("split_2"))
-      )
+      .branch((key, _) => key % 2 != 0, Branched.withConsumer[Int, String](ks => ks.to("split_1")))
+      .branch((key, _) => key % 2 == 0, Branched.withConsumer[Int, String](ks => ks.to("split_2")))
       .defaultBranch(Branched.withConsumer[Int, String](ks => ks.to("split_def")))
 
     val streams = new KafkaStreams(builder.build(), props)
@@ -64,4 +60,3 @@ object SplitTopic extends AdminConnectionProps with ProducerDefault with SetupTo
 
   case class SplitData(key: Int, data: String)
 }
-

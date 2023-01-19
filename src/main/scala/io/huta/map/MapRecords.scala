@@ -24,7 +24,8 @@ object MapRecords extends AdminConnectionProps with ProducerDefault with SetupTo
     val props = kfkProps()
     val builder = new StreamsBuilder
 
-    builder.stream[Int, String]("map_original")
+    builder
+      .stream[Int, String]("map_original")
       .mapValues(_.toUpperCase())
       .to("map_mapped")
 

@@ -17,7 +17,8 @@ class DataProducer(properties: Properties) {
       case t: Throwable => throw t
     }
   }
+}
 
-  sealed trait DataProducerError
+sealed trait DataProducerError
 
-  case class UnexpectedException(exception: Exception) extends DataProducerError
+case class UnexpectedException(exception: Exception) extends DataProducerError

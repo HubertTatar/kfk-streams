@@ -13,7 +13,6 @@ class WordCountTest extends AnyWordSpec with Matchers with BeforeAndAfterAll {
 
   var testDriver: TopologyTestDriver = new TopologyTestDriver(WordCount.buildTopology(), testProps())
 
-
   "test" should {
     val testInputTopic = testDriver.createInputTopic(
       "words_to_count",
@@ -32,7 +31,6 @@ class WordCountTest extends AnyWordSpec with Matchers with BeforeAndAfterAll {
     }
   }
 
-
   def testProps() = {
     val props = new Properties
     props.putAll(
@@ -40,7 +38,7 @@ class WordCountTest extends AnyWordSpec with Matchers with BeforeAndAfterAll {
         StreamsConfig.APPLICATION_ID_CONFIG -> "test",
         StreamsConfig.BOOTSTRAP_SERVERS_CONFIG -> "dummy",
         StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG -> Serdes.String().getClass,
-        StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG -> Serdes.String().getClass,
+        StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG -> Serdes.String().getClass
       ).asJava
     )
     props

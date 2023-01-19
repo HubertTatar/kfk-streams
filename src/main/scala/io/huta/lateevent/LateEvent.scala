@@ -21,22 +21,26 @@ object LateEvent extends AdminConnectionProps with ProducerDefault with Logging 
     val now = System.currentTimeMillis()
     val delay = 1200 - Math.floorMod(now, 1000)
     val timer = new Timer()
-    timer.schedule(new TimerTask {
-      override def run(): Unit = {
-        val ts = System.currentTimeMillis()
-        val second = Math.floorMod(ts / 1000, 60)
+    timer.schedule(
+      new TimerTask {
+        override def run(): Unit = {
+          val ts = System.currentTimeMillis()
+          val second = Math.floorMod(ts / 1000, 60)
 
-        if (second != 58L) {
-          sendMessage(second, ts, "on time", producer)
-          producer.flush()
+          if (second != 58L) {
+            sendMessage(second, ts, "on time", producer)
+            producer.flush()
+          }
+          if (second == 2L) {
+            // send the late record
+            sendMessage(58, ts - 4000, "late", producer)
+            producer.flush()
+          }
         }
-        if (second == 2L) {
-          // send the late record
-          sendMessage(58, ts - 4000, "late", producer)
-          producer.flush()
-        }
-      }
-    }, delay, 1000L)
+      },
+      delay,
+      1000L
+    )
   }
 
   def sendMessage(id: Long, ts: Long, info: String, producer: KafkaProducer[String, String]): Unit = {

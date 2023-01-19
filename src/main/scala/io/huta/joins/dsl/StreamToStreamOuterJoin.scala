@@ -15,7 +15,6 @@ import scala.jdk.CollectionConverters._
 
 object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault with SetupTopic with Logging {
 
-
   def main(args: Array[String]): Unit = {
     //    setup(kfkProps())
     //    producer2(producerProperties())
@@ -25,24 +24,29 @@ object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault
   }
 
   def join(): Unit = {
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
-    implicit def stream1Serde: Serde[Stream1Data] = Serdes.serdeFrom(new JsonSerializer[Stream1Data], new JsonDeserializer[Stream1Data])
+    implicit def stream1Serde: Serde[Stream1Data] =
+      Serdes.serdeFrom(new JsonSerializer[Stream1Data], new JsonDeserializer[Stream1Data])
 
-    implicit def stream2Serde: Serde[Stream2Data] = Serdes.serdeFrom(new JsonSerializer[Stream2Data], new JsonDeserializer[Stream2Data])
+    implicit def stream2Serde: Serde[Stream2Data] =
+      Serdes.serdeFrom(new JsonSerializer[Stream2Data], new JsonDeserializer[Stream2Data])
 
-    implicit def streamJoined: Serde[StreamJoined] = Serdes.serdeFrom(new JsonSerializer[StreamJoined], new JsonDeserializer[StreamJoined])
+    implicit def streamJoined: Serde[StreamJoined] =
+      Serdes.serdeFrom(new JsonSerializer[StreamJoined], new JsonDeserializer[StreamJoined])
 
     val props = kfkProps()
     val builder = new StreamsBuilder
     val stream1 = builder.stream[Int, Stream1Data]("join_topic_1")
     val stream2 = builder.stream[Int, Stream2Data]("join_topic_2")
 
-    val streamsJoined = stream1.outerJoin(stream2)(
-      (s1data, s2data) => StreamJoined(s1data.key, s2data.key, s1data.status, s2data.status),
-      JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(20))
-    ).to("join_output")
+    val streamsJoined = stream1
+      .outerJoin(stream2)(
+        (s1data, s2data) => StreamJoined(s1data.key, s2data.key, s1data.status, s2data.status),
+        JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(20))
+      )
+      .to("join_output")
 
     val streams = new KafkaStreams(builder.build(), props)
     streams.cleanUp()
@@ -99,13 +103,15 @@ object StreamToStreamOuterJoin extends AdminConnectionProps with ProducerDefault
 
   def consumerProperties(): Properties = {
     val props = new Properties()
-    props.putAll(Map(
-      ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094",
-      ConsumerConfig.GROUP_ID_CONFIG -> "test",
-      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
-      ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> "false",
-      ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG -> "false",
-    ).asJava)
+    props.putAll(
+      Map(
+        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094",
+        ConsumerConfig.GROUP_ID_CONFIG -> "test",
+        ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "earliest",
+        ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> "false",
+        ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG -> "false"
+      ).asJava
+    )
     props
   }
 }

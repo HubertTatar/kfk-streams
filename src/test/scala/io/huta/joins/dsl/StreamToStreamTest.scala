@@ -1,7 +1,14 @@
 package io.huta.joins.dsl
 
 import io.huta.wordCount.WordCount
-import org.apache.kafka.common.serialization.{IntegerDeserializer, IntegerSerializer, LongDeserializer, Serdes, StringDeserializer, StringSerializer}
+import org.apache.kafka.common.serialization.{
+  IntegerDeserializer,
+  IntegerSerializer,
+  LongDeserializer,
+  Serdes,
+  StringDeserializer,
+  StringSerializer
+}
 import org.apache.kafka.streams.kstream.JoinWindows
 import org.apache.kafka.streams.scala.StreamsBuilder
 import org.apache.kafka.streams.test.TestRecord
@@ -55,15 +62,18 @@ class StreamToStreamTest extends AnyWordSpec with Matchers with BeforeAndAfterAl
     val leftStream = builder.stream[Int, String](leftTopicName)
     val rightStream = builder.stream[Int, String](rightTopicName)
 
-    leftStream.leftJoin(rightStream)(
-      (left, right) => if (right == null) "not-joined" else "joined",
-      JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(10))
-    ).to(outputTopicName)
+    leftStream
+      .leftJoin(rightStream)(
+        (left, right) => if (right == null) "not-joined" else "joined",
+        JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(10))
+      )
+      .to(outputTopicName)
 
     builder.build()
   }
 
-  def createOutputTopic(name: String) = testDriver.createOutputTopic(name, new IntegerDeserializer, new StringDeserializer)
+  def createOutputTopic(name: String) =
+    testDriver.createOutputTopic(name, new IntegerDeserializer, new StringDeserializer)
 
   def createInputTopic(name: String) = testDriver.createInputTopic(name, new IntegerSerializer(), new StringSerializer)
 
@@ -74,7 +84,7 @@ class StreamToStreamTest extends AnyWordSpec with Matchers with BeforeAndAfterAl
         StreamsConfig.APPLICATION_ID_CONFIG -> "test",
         StreamsConfig.BOOTSTRAP_SERVERS_CONFIG -> "dummy",
         StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG -> Serdes.Integer().getClass,
-        StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG -> Serdes.String().getClass,
+        StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG -> Serdes.String().getClass
       ).asJava
     )
     props

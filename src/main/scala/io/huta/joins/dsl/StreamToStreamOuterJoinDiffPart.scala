@@ -23,22 +23,27 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
   }
 
   def join(): Unit = {
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
-    implicit def stream1Serde: Serde[Stream1Data] = Serdes.serdeFrom(new JsonSerializer[Stream1Data], new JsonDeserializer[Stream1Data])
-    implicit def stream2Serde: Serde[Stream2Data] = Serdes.serdeFrom(new JsonSerializer[Stream2Data], new JsonDeserializer[Stream2Data])
-    implicit def streamJoined: Serde[StreamJoined] = Serdes.serdeFrom(new JsonSerializer[StreamJoined], new JsonDeserializer[StreamJoined])
+    implicit def stream1Serde: Serde[Stream1Data] =
+      Serdes.serdeFrom(new JsonSerializer[Stream1Data], new JsonDeserializer[Stream1Data])
+    implicit def stream2Serde: Serde[Stream2Data] =
+      Serdes.serdeFrom(new JsonSerializer[Stream2Data], new JsonDeserializer[Stream2Data])
+    implicit def streamJoined: Serde[StreamJoined] =
+      Serdes.serdeFrom(new JsonSerializer[StreamJoined], new JsonDeserializer[StreamJoined])
 
     val props = kfkProps()
     val builder = new StreamsBuilder
     val stream1 = builder.stream[Int, Stream1Data]("join_topic_3_part")
     val stream2 = builder.stream[Int, Stream2Data]("join_topic_6_part")
 
-    val streamsJoined = stream1.outerJoin(stream2)(
-      (s1data, s2data) => StreamJoined(s1data.key, s2data.key, s1data.status, s2data.status),
-      JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(30))
-    ).to("join_output_diff_part")
+    val streamsJoined = stream1
+      .outerJoin(stream2)(
+        (s1data, s2data) => StreamJoined(s1data.key, s2data.key, s1data.status, s2data.status),
+        JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(30))
+      )
+      .to("join_output_diff_part")
 
     val streams = new KafkaStreams(builder.build(), props)
     streams.cleanUp()
@@ -49,8 +54,8 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
     }
   }
 
-  def producer2(props: Properties): Runnable = {
-    () => {
+  def producer2(props: Properties): Runnable = { () =>
+    {
       val producer = new KafkaProducer(props, new IntegerSerializer, new JsonSerializer[Stream2Data])
 
       for (i <- 1 to 1_000_000) {
@@ -62,8 +67,8 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
     }
   }
 
-  def producer1(props: Properties): Runnable = {
-    () => {
+  def producer1(props: Properties): Runnable = { () =>
+    {
       val producer = new KafkaProducer(props, new IntegerSerializer, new JsonSerializer[Stream1Data])
 
       for (i <- 1 to 1_000_000) {
@@ -76,6 +81,6 @@ object StreamToStreamOuterJoinDiffPart extends AdminConnectionProps with Produce
   }
 
   def setup(props: Properties): Unit = {
-    setupTopics(props, List("join_topic_3_part","join_topic_6_part", "join_output_diff_part"))
+    setupTopics(props, List("join_topic_3_part", "join_topic_6_part", "join_output_diff_part"))
   }
 }

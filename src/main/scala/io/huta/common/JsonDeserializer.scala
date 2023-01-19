@@ -7,7 +7,6 @@ import org.apache.kafka.common.serialization.Deserializer
 
 import scala.reflect.ClassTag
 
-
 class JsonDeserializer[T](implicit tag: ClassTag[T], ev: Null <:< T) extends Deserializer[T] {
   private val mapper = new ObjectMapper()
     .registerModule(DefaultScalaModule)
@@ -17,10 +16,11 @@ class JsonDeserializer[T](implicit tag: ClassTag[T], ev: Null <:< T) extends Des
 
   override def deserialize(topic: String, bytes: Array[Byte]): T =
     Option(bytes).map { _ =>
-      try mapper.readValue(
-        bytes,
-        tag.runtimeClass.asInstanceOf[Class[T]]
-      )
+      try
+        mapper.readValue(
+          bytes,
+          tag.runtimeClass.asInstanceOf[Class[T]]
+        )
       catch {
         case e: Exception => throw new SerializationException(e)
       }

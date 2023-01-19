@@ -22,10 +22,9 @@ object OneTopicToManyTopics extends AdminConnectionProps with ProducerDefault wi
   }
 
   def oneToMany(): Unit = {
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
-
 
     val props = kfkProps()
     val builder = new StreamsBuilder
@@ -33,17 +32,15 @@ object OneTopicToManyTopics extends AdminConnectionProps with ProducerDefault wi
     val orgStream = builder.stream[Int, String]("onetomany_original")
 
     orgStream
-      .filter { (k, _ ) => k % 2 != 0 }
+      .filter { (k, _) => k % 2 != 0 }
       .to("onetomany_1")
 
     orgStream
-      .filter { (k, _ ) => k % 2 == 0 }
+      .filter { (k, _) => k % 2 == 0 }
       .to("onetomany_2")
 
     orgStream
       .to("onetomany_def")
-
-
 
     val streams = new KafkaStreams(builder.build(), props)
     streams.cleanUp()
@@ -53,7 +50,6 @@ object OneTopicToManyTopics extends AdminConnectionProps with ProducerDefault wi
       streams.close(Duration.ofSeconds(5))
     }
   }
-
 
   def producer(props: Properties): Runnable =
     () => {

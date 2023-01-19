@@ -16,22 +16,22 @@ object EventProcessor extends Logging {
   def main(args: Array[String]): Unit = {
     val props = kfkProps()
     val builder = new StreamsBuilder
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
     builder
       .stream[String, String]("late_event")
-      .groupBy((k,v) => "dummy")
+      .groupBy((k, v) => "dummy")
       .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(10)))
 //      .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofSeconds(10), Duration.ofSeconds(10)))
       .count()
       .toStream
-      .map{ (ws, i) => (s"${ws.window().start()}", s"$i") }
+      .map { (ws, i) => (s"${ws.window().start()}", s"$i") }
       .to("aggs")
 
     val topology = builder.build()
 
-    //update every time an event is received
+    // update every time an event is received
     props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, "0")
 
     val streams = new KafkaStreams(topology, props)

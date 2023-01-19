@@ -18,13 +18,14 @@ object WordCount extends AdminConnectionProps with Logging {
   }
 
   def buildTopology(): Topology = {
-    //implcits for Consumed.with for builder.stream
+    // implcits for Consumed.with for builder.stream
     import org.apache.kafka.streams.scala.ImplicitConversions._
     import org.apache.kafka.streams.scala.serialization.Serdes._
 
     val builder = new StreamsBuilder
 
-    builder.stream[String, String]("words_to_count")
+    builder
+      .stream[String, String]("words_to_count")
       .mapValues(_.toLowerCase())
       .flatMapValues(txt => txt.split(" "))
       .groupBy((_, word) => word)

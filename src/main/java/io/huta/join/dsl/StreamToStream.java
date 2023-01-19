@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class StreamToStream implements AdminConnectionProps, SetupTopic {
 
-    private final String LEFT_STREAM = "left_stream";
+/*    private final String LEFT_STREAM = "left_stream";
     private final String RIGHT_STREAM = "right_stream";
     private final String OUTPUT_STREAM = "output_stream";
 
@@ -35,7 +35,5 @@ public class StreamToStream implements AdminConnectionProps, SetupTopic {
         } finally {
             admin.close();
         }
-    }
-
-
+    }*/
 }
